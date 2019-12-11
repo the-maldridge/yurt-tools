@@ -45,11 +45,9 @@ func getTasksFromNomad() ([]task, error) {
 
 	tasklist := []task{}
 	for _, i := range list {
-		t := task{}
 		if i.Stop || i.Type == api.JobTypeBatch {
 			continue
 		}
-		t.Name = i.Name
 
 		job, _, err := c.Jobs().Info(i.ID, nil)
 		if err != nil {
@@ -57,8 +55,11 @@ func getTasksFromNomad() ([]task, error) {
 			continue
 		}
 		for _, taskGroup := range job.TaskGroups {
-			for _, task := range taskGroup.Tasks {
-				t.Image = task.Config["image"].(string)
+			for _, nomadTask := range taskGroup.Tasks {
+				t := task {
+					Name: *job.Name + "/" + nomadTask.Name,
+				}
+				t.Image = nomadTask.Config["image"].(string)
 				parts := strings.SplitN(t.Image, ":", 2)
 				if len(parts) != 2 {
 					log.Printf("Task %s has invalid tag: %s", t.Name, t.Image)
@@ -67,8 +68,8 @@ func getTasksFromNomad() ([]task, error) {
 					t.Image = parts[0]
 					t.Version = parts[1]
 				}
+				tasklist = append(tasklist, t)
 			}
-			tasklist = append(tasklist, t)
 		}
 	}
 	return tasklist, nil
@@ -82,6 +83,11 @@ func getTagsForImage(repo string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	if !strings.Contains(repo, "/") {
+		repo = "library/" + repo
+	}
+
 	tags, err := hub.Tags(repo)
 	if err != nil {
 		return nil, err
