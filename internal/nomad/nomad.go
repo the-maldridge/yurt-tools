@@ -21,6 +21,7 @@ type QueryOpts struct {
 
 type Task struct {
 	Job    string
+	Group  string
 	Name   string
 	Driver string
 	URL    string
@@ -66,6 +67,7 @@ func (c *Client) ListTasks(cfg QueryOpts) ([]Task, error) {
 			for _, task := range taskGroup.Tasks {
 				t := Task{
 					Job:    *job.Name,
+					Group:  *taskGroup.Name,
 					Name:   task.Name,
 					Driver: task.Driver,
 				}

@@ -6,13 +6,11 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"sort"
 	"time"
-
-	"github.com/hashicorp/go-version"
 
 	"github.com/the-maldridge/yurt-tools/internal/docker"
 	"github.com/the-maldridge/yurt-tools/internal/nomad"
+	"github.com/the-maldridge/yurt-tools/internal/versions"
 )
 
 var (
@@ -53,13 +51,6 @@ func getNewerVersions(tl []nomad.Task) ([]task, error) {
 		out[i].Version = task.Docker.Tag
 		out[i].Url = task.URL
 
-		have, err := version.NewVersion(task.Docker.Tag)
-		if err != nil {
-			log.Printf("Task %s has uncomparable version: %s", task.Name, err)
-			out[i].NoData = true
-			continue
-		}
-
 		tags, err := ds.GetTags(task.Docker)
 		if err != nil {
 			log.Println(err)
@@ -67,28 +58,11 @@ func getNewerVersions(tl []nomad.Task) ([]task, error) {
 			continue
 		}
 
-		versions := []*version.Version{}
-		for i := range tags {
-			v, err := version.NewVersion(tags[i])
-			if err != nil {
-				continue
-			}
-			versions = append(versions, v)
+		vi := versions.Compare(task.Docker.Tag, tags)
+		if !vi.UpToDate {
+			out[i].Newer = vi.Available
 		}
-		sort.Sort(sort.Reverse(version.Collection(versions)))
-
-		for _, v := range versions {
-			if err != nil {
-				log.Println("Attempted to parse unparseable version", task.Name, err)
-				continue
-			}
-			if have.LessThan(v) {
-				out[i].Newer = append(out[i].Newer, v.Original())
-			}
-			if len(out[i].Newer) > 5 {
-				break
-			}
-		}
+		out[i].NoData = vi.NonComparable
 	}
 	return out, nil
 }
