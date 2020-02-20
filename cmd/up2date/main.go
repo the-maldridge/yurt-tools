@@ -10,14 +10,15 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-version"
-	"github.com/heroku/docker-registry-client/registry"
 
+	"github.com/the-maldridge/yurt-tools/internal/docker"
 	"github.com/the-maldridge/yurt-tools/internal/nomad"
 )
 
 var (
 	pageinfo pagedata
 	nc       *nomad.Client
+	ds       *docker.Docker
 )
 
 type pagedata struct {
@@ -34,24 +35,8 @@ type task struct {
 	NoData  bool
 }
 
-func getTagsForImage(hub *registry.Registry, repo string) ([]string, error) {
-	tags, err := hub.Tags(repo)
-	if err != nil {
-		return nil, err
-	}
-	return tags, nil
-}
-
 func getNewerVersions(tl []nomad.Task) ([]task, error) {
 	out := make([]task, len(tl))
-
-	url := "https://registry-1.docker.io/"
-	username := os.Getenv("UP2DATE_REGISTRY_USERNAME")
-	password := os.Getenv("UP2DATE_REGISTRY_PASSWORD")
-	hub, err := registry.New(url, username, password)
-	if err != nil {
-		return nil, err
-	}
 
 	for i, task := range tl {
 		if task.Driver != "docker" {
@@ -75,7 +60,7 @@ func getNewerVersions(tl []nomad.Task) ([]task, error) {
 			continue
 		}
 
-		tags, err := getTagsForImage(hub, repoStr)
+		tags, err := ds.GetTags(task.Docker)
 		if err != nil {
 			log.Println(err)
 			out[i].NoData = true
@@ -134,6 +119,11 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	var err error
 	nc, err = nomad.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ds, err = docker.New()
 	if err != nil {
 		log.Fatal(err)
 	}
