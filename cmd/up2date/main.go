@@ -7,16 +7,17 @@ import (
 	"net/http"
 	"os"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/hashicorp/go-version"
-	"github.com/hashicorp/nomad/api"
 	"github.com/heroku/docker-registry-client/registry"
+
+	"github.com/the-maldridge/yurt-tools/internal/nomad"
 )
 
 var (
 	pageinfo pagedata
+	nc       *nomad.Client
 )
 
 type pagedata struct {
@@ -33,62 +34,7 @@ type task struct {
 	NoData  bool
 }
 
-func getTasksFromNomad() ([]task, error) {
-	c, err := api.NewClient(api.DefaultConfig())
-	if err != nil {
-		return nil, err
-	}
-
-	list, _, err := c.Jobs().List(nil)
-	if err != nil {
-		return nil, err
-	}
-
-	tasklist := []task{}
-	for _, i := range list {
-		if i.Stop || i.Type == api.JobTypeBatch {
-			continue
-		}
-
-		job, _, err := c.Jobs().Info(i.ID, nil)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-		for _, taskGroup := range job.TaskGroups {
-			for _, nomadTask := range taskGroup.Tasks {
-				t := task{
-					Name: *job.Name + "/" + nomadTask.Name,
-				}
-				t.Image = nomadTask.Config["image"].(string)
-				parts := strings.SplitN(t.Image, ":", 2)
-				if len(parts) != 2 {
-					log.Printf("Task %s has invalid tag: %s", t.Name, t.Image)
-					t.Version = "0.0.0"
-				} else {
-					t.Image = parts[0]
-					t.Version = parts[1]
-				}
-				switch strings.Count(parts[0], "/") {
-				case 0:
-					t.Url = fmt.Sprintf("https://hub.docker.com/_/%s", parts[0])
-				case 1:
-					t.Url = fmt.Sprintf("https://hub.docker.com/r/%s", parts[0])
-				default:
-					t.Url = fmt.Sprintf("https://%s", parts[0])
-				}
-				tasklist = append(tasklist, t)
-			}
-		}
-	}
-	return tasklist, nil
-}
-
 func getTagsForImage(hub *registry.Registry, repo string) ([]string, error) {
-	if !strings.Contains(repo, "/") {
-		repo = "library/" + repo
-	}
-
 	tags, err := hub.Tags(repo)
 	if err != nil {
 		return nil, err
@@ -96,7 +42,7 @@ func getTagsForImage(hub *registry.Registry, repo string) ([]string, error) {
 	return tags, nil
 }
 
-func getNewerVersions(tl []task) ([]task, error) {
+func getNewerVersions(tl []nomad.Task) ([]task, error) {
 	out := make([]task, len(tl))
 
 	url := "https://registry-1.docker.io/"
@@ -108,14 +54,28 @@ func getNewerVersions(tl []task) ([]task, error) {
 	}
 
 	for i, task := range tl {
-		out[i] = tl[i]
-		have, err := version.NewVersion(task.Version)
+		if task.Driver != "docker" {
+			continue
+		}
+
+		repoStr := task.Docker.Owner + "/" + task.Docker.Image
+		if task.Docker.Owner == "" {
+			repoStr = "library/" + task.Docker.Image
+		}
+
+		out[i].Name = task.Job + "/" + task.Name
+		out[i].Image = repoStr
+		out[i].Version = task.Docker.Tag
+		out[i].Url = task.URL
+
+		have, err := version.NewVersion(task.Docker.Tag)
 		if err != nil {
 			log.Printf("Task %s has uncomparable version: %s", task.Name, err)
 			out[i].NoData = true
 			continue
 		}
-		tags, err := getTagsForImage(hub, task.Image)
+
+		tags, err := getTagsForImage(hub, repoStr)
 		if err != nil {
 			log.Println(err)
 			out[i].NoData = true
@@ -149,19 +109,19 @@ func getNewerVersions(tl []task) ([]task, error) {
 }
 
 func updateData() {
-	tasklist, err := getTasksFromNomad()
+	tasklist, err := nc.ListTasks(nomad.QueryOpts{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		os.Exit(1)
 	}
 
-	tasklist, err = getNewerVersions(tasklist)
+	tl, err := getNewerVersions(tasklist)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		os.Exit(1)
 	}
 
-	pageinfo.TaskList = tasklist
+	pageinfo.TaskList = tl
 	pageinfo.Updated = time.Now()
 	fmt.Println("Update complete!")
 }
@@ -172,6 +132,12 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	var err error
+	nc, err = nomad.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	go func() {
 		updateData()
 		for range time.Tick(time.Hour * 4) {
