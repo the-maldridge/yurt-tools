@@ -1,4 +1,4 @@
-module github.com/the-maldridge/yurt-tools.git
+module github.com/the-maldridge/yurt-tools
 
 go 1.13
 
