@@ -54,3 +54,16 @@ func (i Image) URL() string {
 		return "https://" + i.Owner + "/" + i.Image
 	}
 }
+
+// Registry returns the registry that owns the requested image.
+// This allows pulling registries from a map rather than trying to
+// initialize a new registry for every context.
+func (i Image) Registry() RegistryInfo {
+	imgURL := i.URL()
+	switch {
+	case strings.Contains(imgURL, "quay.io"):
+		return RegistryInfo{"quay-io", "https://quay.io/"}
+	default:
+		return RegistryInfo{"docker-hub", "https://registry-1.docker.io/"}
+	}
+}

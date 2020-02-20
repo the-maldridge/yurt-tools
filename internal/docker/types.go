@@ -7,3 +7,8 @@ type Image struct {
 	Image string
 	Tag   string
 }
+
+type RegistryInfo struct {
+	Name string
+	URL  string
+}
