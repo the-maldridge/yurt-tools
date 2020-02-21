@@ -34,7 +34,9 @@ func main() {
 			}
 
 			info := versions.Compare(task.Docker.Tag, tags)
-			log.Println(info)
+			if err := cs.UpdateTaskData(task, "versions", info); err != nil {
+				log.Printf("Could not update task data for %s: %v", task.Name, err)
+			}
 		}
 	}
 }

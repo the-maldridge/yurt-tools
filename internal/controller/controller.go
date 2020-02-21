@@ -38,7 +38,7 @@ func (c *Controller) Discover() error {
 	}
 
 	for _, task := range tasks {
-		if err := c.cs.UpdateTaskMeta(task); err != nil {
+		if err := c.cs.UpdateTaskData(task, "metadata", task); err != nil {
 			log.Printf("Could not update task metadata: %v", err)
 		}
 	}

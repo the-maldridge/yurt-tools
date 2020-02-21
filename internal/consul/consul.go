@@ -17,6 +17,8 @@ type Consul struct {
 	prefix string
 }
 
+type TaskData map[string]interface{}
+
 func New() (*Consul, error) {
 	c, err := api.NewClient(api.DefaultConfig())
 	if err != nil {
@@ -33,14 +35,14 @@ func New() (*Consul, error) {
 	return x, nil
 }
 
-func (c *Consul) UpdateTaskData(t nomad.Task) error {
-	bytes, err := json.Marshal(t)
+func (c *Consul) UpdateTaskData(t nomad.Task, key string, data interface{}) error {
+	bytes, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
 
 	pair := api.KVPair{
-		Key:   path.Join(c.prefix, "taskinfo", t.Job, t.Group, t.Name, "metadata"),
+		Key:   path.Join(c.prefix, "taskinfo", t.Job, t.Group, t.Name, key),
 		Value: bytes,
 	}
 
@@ -62,8 +64,32 @@ func (c *Consul) KnownTasks() ([]nomad.Task, error) {
 		t := nomad.Task{}
 		if err := json.Unmarshal(kv.Value, &t); err != nil {
 			log.Printf("Bad json at key: %s %v", kv.Key, err)
+			continue
+		}
+		if t.Name == "" {
+			// Empty task
+			continue
 		}
 		out = append(out, t)
 	}
 	return out, nil
+}
+
+func (c *Consul) LoadAllForTask(t nomad.Task) (TaskData, error) {
+	m := make(TaskData)
+
+	kvps, _, err := c.KV().List(path.Join(c.prefix, "taskinfo", t.Job, t.Group, t.Name), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, kv := range kvps {
+		var tmp interface{}
+		if err := json.Unmarshal(kv.Value, &tmp); err != nil {
+			log.Printf("Couldn't unmarshal data for %s:%s - %v", t.Name, kv.Key, err)
+			continue
+		}
+		m[path.Base(kv.Key)] = tmp
+	}
+	return m, nil
 }
