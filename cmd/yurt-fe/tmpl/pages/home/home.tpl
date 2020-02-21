@@ -11,10 +11,10 @@
     {{ range $group, $groupdata := $jobdata }}
     {{ range $task, $taskdata := $groupdata }}
     <tr>
-        <td>{{$job}}</td>
-        <td>{{$group}}</td>
-        <td>{{$task}}</td>
-        <td>{{if not $taskdata.versions.NonComparable}}{{$taskdata.versions.UpToDate}}{{else}}Unknown{{end}}</td>
+      <td>{{$job}}</td>
+      <td>{{$group}}</td>
+      <td><a href="/detail/{{$job}}/{{$group}}/{{$task}}">{{$task}}</a></td>
+      <td>{{if not $taskdata.versions.NonComparable}}{{$taskdata.versions.UpToDate}}{{else}}Unknown{{end}}</td>
     </tr>
     {{ end }}
     {{ end }}

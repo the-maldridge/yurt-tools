@@ -3,9 +3,11 @@ package main
 import (
 	"log"
 	"net/http"
-	"html/template"
+
+	"github.com/labstack/echo"
 
 	"github.com/the-maldridge/yurt-tools/internal/consul"
+	"github.com/the-maldridge/yurt-tools/internal/web"
 )
 
 var (
@@ -35,9 +37,13 @@ func update() {
 	}
 }
 
-func homePageHandler(w http.ResponseWriter, r *http.Request) {
-	t := template.Must(template.ParseFiles("tpl/base.tpl", "tpl/home.tpl"))
-	t.Execute(w, taskdata)
+func homePageView(c echo.Context) error {
+	return c.Render(http.StatusOK, "home", taskdata)
+}
+
+func taskDetailView(c echo.Context) error {
+	data := taskdata[c.Param("job")][c.Param("group")][c.Param("task")]
+	return c.Render(http.StatusOK, "task-detail", data)
 }
 
 func main() {
@@ -51,6 +57,15 @@ func main() {
 
 	update()
 
-	http.HandleFunc("/", homePageHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	h, err := web.New("static", "tmpl")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	h.GET("/", homePageView)
+	h.GET("/detail/:job/:group/:task", taskDetailView)
+
+	if err := h.Serve(); err != nil {
+		log.Fatal(err)
+	}
 }
