@@ -1,9 +1,9 @@
 package web
 
 import (
-	"log"
 	"html/template"
 	"io"
+	"log"
 	"path/filepath"
 	"strings"
 

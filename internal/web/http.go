@@ -4,7 +4,6 @@ import (
 	"github.com/labstack/echo"
 )
 
-
 // Server serves the user interface over http using Echo.
 type Server struct {
 	*echo.Echo
@@ -27,7 +26,6 @@ func New(static, tmpl string) (*Server, error) {
 	s.Static("/static", s.staticDir)
 	return &s, nil
 }
-
 
 func (s *Server) Serve() error {
 	return s.Start(":8080")
