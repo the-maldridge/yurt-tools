@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo"
 
@@ -46,6 +47,11 @@ func taskDetailView(c echo.Context) error {
 	return c.Render(http.StatusOK, "task-detail", data)
 }
 
+func updateTrigger(c echo.Context) error {
+	update()
+	return c.String(http.StatusOK, "Updated")
+}
+
 func main() {
 	taskdata = make(map[string]map[string]map[string]consul.TaskData)
 
@@ -55,7 +61,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	update()
+	go func() {
+		update()
+		for range time.Tick(time.Hour) {
+			update()
+		}
+	}()
 
 	h, err := web.New("static", "tmpl")
 	if err != nil {
@@ -64,6 +75,7 @@ func main() {
 
 	h.GET("/", homePageView)
 	h.GET("/detail/:job/:group/:task", taskDetailView)
+	h.GET("/update-now", updateTrigger)
 
 	if err := h.Serve(); err != nil {
 		log.Fatal(err)
