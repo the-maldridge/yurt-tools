@@ -22,4 +22,9 @@
 </div>
 {{ end }}
 {{ end }}
+{{ if .trivy }}
+<div id="task-trivy">
+  {{ . }}
+</div>
+{{ end }}
 {{ end }}
