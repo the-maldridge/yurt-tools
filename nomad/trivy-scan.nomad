@@ -46,7 +46,10 @@ apk add curl
 if [ -f /secrets/{{env "NOMAD_META_TRIVY_REGISTRY" }} ] ; then
         . /secrets/{{ env "NOMAD_META_TRIVY_REGISTRY" }}
 fi
-trivy --light -f json -o trivy.json {{ env "NOMAD_META_TRIVY_CONTAINER" }}
+trivy client --remote http://trivy.service.consul:1284 \
+        -f json -o trivy.json \
+        {{ env "NOMAD_META_TRIVY_CONTAINER" }}
+
 curl -X PUT \
         -H "Authorization: Bearer $CONSUL_HTTP_TOKEN" \
         -d @trivy.json \
@@ -58,10 +61,10 @@ EOH
       }
       template {
         data = <<EOH
-TRIVY_AUTH_URL=https://registry.hub.docker.com
+export TRIVY_AUTH_URL=https://registry.hub.docker.com
 {{- with secret "secret/data/prod/trivy" }}
-TRIVY_USERNAME="{{.Data.data.docker_username}}"
-TRIVY_PASSWORD="{{.Data.data.docker_password}}"
+export TRIVY_USERNAME="{{.Data.data.docker_username}}"
+export TRIVY_PASSWORD="{{.Data.data.docker_password}}"
 {{- end }}
 EOH
         destination = "secrets/docker-hub"
