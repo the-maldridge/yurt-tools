@@ -84,3 +84,11 @@ func (c *Client) ListTasks(cfg QueryOpts) ([]Task, error) {
 	}
 	return tl, nil
 }
+
+// Dispatch can be used to dispatch a parameterized task.
+func (c *Client) Dispatch(name string, kv map[string]string) error {
+	if _, _, err := c.Jobs().Dispatch(name, kv, nil, nil); err != nil {
+		return err
+	}
+	return nil
+}

@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"path"
 	"strings"
 )
 
@@ -66,4 +67,13 @@ func (i Image) Registry() RegistryInfo {
 	default:
 		return RegistryInfo{"docker-hub", "https://registry-1.docker.io/"}
 	}
+}
+
+// RepoStr returns the string that can be fed directly to docker to
+// pull the image.
+func (i Image) RepoStr() string {
+	if i.Owner == "" {
+		return i.Image + ":" + i.Tag
+	}
+	return path.Join(i.Owner, i.Image) + ":" + i.Tag
 }
