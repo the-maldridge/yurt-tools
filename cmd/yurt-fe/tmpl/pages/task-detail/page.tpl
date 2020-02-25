@@ -19,11 +19,14 @@
 {{ with .versions }}
 <div id="task-versions">
   {{ . }}
+  <br />
 </div>
 {{ end }}
 {{ end }}
 {{ if .trivy }}
 <div id="task-trivy">
+  Trivy Results:
+  <br />
   {{ . }}
 </div>
 {{ end }}
