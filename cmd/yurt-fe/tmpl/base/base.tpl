@@ -2,6 +2,8 @@
 <html>
   <head>
     <title>Yurt Tools</title>
+    <link rel="stylesheet" href="/static/reset.css"> 
+    <link rel="stylesheet" href="/static/style.css"> 
   </head>
   <body>
     {{ with .data }}
