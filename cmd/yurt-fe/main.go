@@ -39,12 +39,12 @@ func update() {
 }
 
 func homePageView(c echo.Context) error {
-	return c.Render(http.StatusOK, "home", taskdata)
+	return c.JSON(http.StatusOK, taskdata)
 }
 
 func taskDetailView(c echo.Context) error {
 	data := taskdata[c.Param("job")][c.Param("group")][c.Param("task")]
-	return c.Render(http.StatusOK, "task-detail", data)
+	return c.JSON(http.StatusOK, data)
 }
 
 func updateTrigger(c echo.Context) error {
@@ -68,12 +68,12 @@ func main() {
 		}
 	}()
 
-	h, err := web.New("static", "tmpl")
+	h, err := web.New()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	h.GET("/", homePageView)
+	h.GET("/detail", homePageView)
 	h.GET("/detail/:job/:group/:task", taskDetailView)
 	h.GET("/update-now", updateTrigger)
 

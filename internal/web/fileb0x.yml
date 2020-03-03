@@ -1,0 +1,10 @@
+---
+pkg: web
+dest: ./
+fmt: false
+compression:
+  compress: true
+custom:
+  - files:
+      - "./build"
+    base: "build"

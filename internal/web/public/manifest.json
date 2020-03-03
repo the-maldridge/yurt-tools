@@ -1,0 +1,8 @@
+{
+  "short_name": "Yurt Tools",
+  "name": "Yurt tools for the vigilant nomad",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
