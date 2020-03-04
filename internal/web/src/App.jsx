@@ -55,7 +55,7 @@ function App() {
   const [currentTask, setCurrentTask] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:8080/detail")
+    fetch("/detail")
       .then(response => response.json())
       .then(jobs =>
         setAllTasks(
