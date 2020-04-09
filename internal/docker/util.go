@@ -43,13 +43,13 @@ func (i Image) URL() string {
 		return "https://hub.docker.com/_/" + i.Image
 	}
 
-	// If there is exactly 1 slash in the name, it is likely from
+	// If there are no slashes in the Owner, it is likely to be from
 	// hub.docker.com.  To be sure we could check for any dots in
 	// the name, but this should be sufficient for most cases.  If
 	// you're here because it wasn't, send a PR extending this
 	// check.
 	switch strings.Count(i.Owner, "/") {
-	case 1:
+	case 0:
 		return "https://hub.docker.com/r/" + i.Owner + "/" + i.Image
 	default:
 		return "https://" + i.Owner + "/" + i.Image
