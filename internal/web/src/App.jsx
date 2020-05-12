@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import Drawer from "@material-ui/core/Drawer";
+import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import {
   ThemeProvider,
   createMuiTheme,
@@ -51,66 +52,58 @@ function App() {
     []
   );
 
-  const [allTasks, setAllTasks] = useState([]);
-  const [currentTask, setCurrentTask] = useState(null);
+  const [allJobs, setAllJobs] = useState(null);
 
   useEffect(() => {
     fetch("/detail")
       .then(response => response.json())
-      .then(jobs =>
-        setAllTasks(
-          Object.entries(jobs)
-            .flatMap(([job, groups]) =>
-              Object.entries(groups).flatMap(([group, tasks]) =>
-                Object.entries(tasks).flatMap(([name, task]) => ({
-                  ...task,
-                  task: name,
-                  group: group,
-                  job: job,
-                  vulnerable: task.trivy
-                    ? task.trivy
-                        .map(target => !!target.Vulnerabilities)
-                        .reduce((acc, cur) => cur || acc, false)
-                    : null
-                }))
-              )
-            )
-            .map((task, i) => ({ ...task, id: i }))
-        )
-      );
+      .then(jobs => setAllJobs(jobs));
   }, []);
 
   return (
-    <ThemeProvider theme={theme}>
-      <div className={classes.root}>
-        <CssBaseline />
-        <Drawer
-          className={classes.drawer}
-          variant="permanent"
-          classes={{
-            paper: classes.drawerPaper
-          }}
-          anchor="left"
-        >
-          <Sidebar
-            tasks={allTasks}
-            currentTask={currentTask}
-            setCurrentTask={setCurrentTask}
-          />
-        </Drawer>
-        {currentTask ? (
-          <div className={classes.content}>
-            <TaskBody currentTask={currentTask} />
-          </div>
-        ) : (
-          <div className={classes.content}>
-            <Typography variant="h5" color="inherit">
-              Select a task
-            </Typography>
-          </div>
-        )}
-      </div>
-    </ThemeProvider>
+    <Router>
+      <ThemeProvider theme={theme}>
+        <div className={classes.root}>
+          <CssBaseline />
+          <Drawer
+            className={classes.drawer}
+            variant="permanent"
+            classes={{
+              paper: classes.drawerPaper
+            }}
+            anchor="left"
+          >
+            <Sidebar jobs={allJobs} />
+          </Drawer>
+          <Switch>
+            <Route
+              path={`/task/:job/:group/:task`}
+              render={({ match: { params } }) => {
+                return (
+                  <div className={classes.content}>
+                    <TaskBody
+                      currentTask={
+                        allJobs
+                          ? allJobs[params.job][params.group][params.task]
+                          : null
+                      }
+                      {...params}
+                    />
+                  </div>
+                );
+              }}
+            />
+            <Route>
+              <div className={classes.content}>
+                <Typography variant="h5" color="inherit">
+                  Select a task
+                </Typography>
+              </div>
+            </Route>
+          </Switch>
+        </div>
+      </ThemeProvider>
+    </Router>
   );
 }
 

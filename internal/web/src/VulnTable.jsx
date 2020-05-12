@@ -54,7 +54,18 @@ export default function VulnTable({ target, vulnerabilities }) {
         ).map((vuln, id) => (
           <TableRow key={id}>
             <TableCell>{vuln.PkgName}</TableCell>
-            <TableCell style={{maxWidth: "15em"}}>{vuln.VulnerabilityID}<sup style={{display: "inline"}}>{(vuln.References || []).map((ref, i) => <><a href={ref} style={{color: "white"}}>{i}</a>{' '}</>)}</sup></TableCell>
+            <TableCell style={{ maxWidth: "15em" }}>
+              {vuln.VulnerabilityID}
+              <sup style={{ display: "inline" }}>
+                {(vuln.References || []).map((ref, i) => (
+                  <>
+                    <a href={ref} style={{ color: "white" }}>
+                      {i}
+                    </a>{" "}
+                  </>
+                ))}
+              </sup>
+            </TableCell>
             <TableCell>{vuln.Title || "N/A"}</TableCell>
             <TableCell>{vuln.InstalledVersion}</TableCell>
             <TableCell>{vuln.FixedVersion || "N/A"}</TableCell>

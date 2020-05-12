@@ -12,19 +12,20 @@ export default function VulnSummary({ onClose, vulnerabilities, open }) {
       <Container>
         {vulnerabilities ? (
           vulnerabilities.map(({ Target, Vulnerabilities }) => {
-
-            const bySeverity = Vulnerabilities ? Vulnerabilities.reduce(
-              (acc, cur) => ({
-                ...acc,
-                [cur.Severity]: (acc[cur.Severity] || 0) + 1
-              }),
-              {}
-            ) : ({None: 0});
+            const bySeverity = Vulnerabilities
+              ? Vulnerabilities.reduce(
+                  (acc, cur) => ({
+                    ...acc,
+                    [cur.Severity]: (acc[cur.Severity] || 0) + 1
+                  }),
+                  {}
+                )
+              : { None: 0 };
             return (
               <>
                 <b>{Target}</b>
                 {Object.entries(bySeverity).map(([severity, count]) => (
-                  <div style={{paddingBottom: "5px"}}>
+                  <div style={{ paddingBottom: "5px" }}>
                     <span
                       style={{
                         color:
