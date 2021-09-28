@@ -13,12 +13,14 @@ type Client struct {
 	*api.Client
 }
 
+// QueryOpts shadows the nomad type of the same name.
 type QueryOpts struct {
 	Region    string
 	Namespace string
 	Prefix    string
 }
 
+// Task represents a simplified view of a nomad task.
 type Task struct {
 	Job    string
 	Group  string
@@ -28,6 +30,8 @@ type Task struct {
 	Docker docker.Image
 }
 
+// New returns a new nomad client initialized with parameters from the
+// environment.
 func New() (*Client, error) {
 	c, err := api.NewClient(api.DefaultConfig())
 	if err != nil {

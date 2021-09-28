@@ -1,14 +1,33 @@
-package main
+package cmdlets
 
 import (
 	"log"
+
+	"github.com/spf13/cobra"
 
 	"github.com/the-maldridge/yurt-tools/internal/consul"
 	"github.com/the-maldridge/yurt-tools/internal/docker"
 	"github.com/the-maldridge/yurt-tools/internal/versions"
 )
 
-func main() {
+var (
+	infoVersionsCmd = &cobra.Command{
+		Use:   "version-check",
+		Short: "Seek newer versions of task artifacts",
+		Long:  versionsCmdLongDocs,
+		Run:   versionsCmdRun,
+	}
+	versionsCmdLongDocs = `The version checker reaches out to remote repositories to determine
+newer versions of available containers.  Versions will be compared
+using go-version to determine up to 5 versions newer than what is
+currently deployed.`
+)
+
+func init() {
+	infoCmd.AddCommand(infoVersionsCmd)
+}
+
+func versionsCmdRun(c *cobra.Command, args []string) {
 	cs, err := consul.New()
 	if err != nil {
 		log.Fatal(err)

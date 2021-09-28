@@ -1,13 +1,30 @@
-package main
+package cmdlets
 
 import (
 	"log"
+
+	"github.com/spf13/cobra"
 
 	"github.com/the-maldridge/yurt-tools/internal/consul"
 	"github.com/the-maldridge/yurt-tools/internal/nomad"
 )
 
-func main() {
+var (
+	infoDiscoverCmd = &cobra.Command{
+		Use: "discover",
+		Short: "discover tasks running in Nomad",
+		Long: discoverCmdLongDocs,
+		Run: discoverCmdRun,
+	}
+	discoverCmdLongDocs = `scrape a listing of all tasks running in Nomad and store them for
+other tasks to key off of.`
+)
+
+func init() {
+	infoCmd.AddCommand(infoDiscoverCmd)
+}
+
+func discoverCmdRun(c *cobra.Command, args []string) {
 	nc, err := nomad.New()
 	if err != nil {
 		log.Fatal(err)

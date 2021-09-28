@@ -1,15 +1,34 @@
-package main
+package cmdlets
 
 import (
 	"log"
 	"os"
 	"path"
 
+	"github.com/spf13/cobra"
+
 	"github.com/the-maldridge/yurt-tools/internal/consul"
 	"github.com/the-maldridge/yurt-tools/internal/nomad"
 )
 
-func main() {
+var (
+	infoTrivyCmd = &cobra.Command{
+		Use:   "trivy-dispatch",
+		Short: "Launch trivy scans for all compatible discovered containers",
+		Long:  trivyCmdLongDocs,
+		Run:   trivyCmdRun,
+	}
+	trivyCmdLongDocs = `Security scanning of compatible container images is performed by
+Aquasec Trivy (https://aquasecurity.github.io/trivy/.  This info
+provider can be used to launch highly parallel scans of your
+discovered containers to a trivy server.).`
+)
+
+func init() {
+	infoCmd.AddCommand(infoTrivyCmd)
+}
+
+func trivyCmdRun(c *cobra.Command, args []string) {
 	prefix := os.Getenv("CONSUL_PREFIX")
 	if prefix == "" {
 		prefix = "yurt-tools"

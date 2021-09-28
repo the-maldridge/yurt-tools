@@ -14,8 +14,6 @@ require (
 	github.com/nokia/docker-registry-client v0.0.0-20190305095957-e91f10057c5b
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/sirupsen/logrus v1.4.2 // indirect
-	github.com/stretchr/testify v1.4.0
-	golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c // indirect
-	golang.org/x/net v0.0.0-20190311183353-d8887717615a
-	golang.org/x/sync v0.0.0-20190423024810-112230192c58 // indirect
+	github.com/spf13/cobra v1.2.1
+	github.com/stretchr/testify v1.7.0
 )
