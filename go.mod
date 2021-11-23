@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/docker/distribution v0.0.0-20171011171712-7484e51bf6af // indirect
 	github.com/docker/libtrust v0.0.0-20160708172513-aabc10ec26b7 // indirect
+	github.com/go-chi/chi/v5 v5.0.7 // indirect
 	github.com/gorilla/mux v1.7.3 // indirect
 	github.com/hashicorp/consul/api v1.4.0
 	github.com/hashicorp/go-version v1.2.0
