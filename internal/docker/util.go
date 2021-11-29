@@ -64,6 +64,8 @@ func (i Image) Registry() RegistryInfo {
 	switch {
 	case strings.Contains(imgURL, "quay.io"):
 		return RegistryInfo{"quay-io", "https://quay.io/"}
+	case strings.Contains(imgURL, "ghcr.io"):
+		return RegistryInfo{"ghcr", "https://ghcr.io/"}
 	default:
 		return RegistryInfo{"docker-hub", "https://registry-1.docker.io/"}
 	}
