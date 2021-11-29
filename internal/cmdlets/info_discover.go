@@ -11,10 +11,10 @@ import (
 
 var (
 	infoDiscoverCmd = &cobra.Command{
-		Use: "discover",
+		Use:   "discover",
 		Short: "discover tasks running in Nomad",
-		Long: discoverCmdLongDocs,
-		Run: discoverCmdRun,
+		Long:  discoverCmdLongDocs,
+		Run:   discoverCmdRun,
 	}
 	discoverCmdLongDocs = `scrape a listing of all tasks running in Nomad and store them for
 other tasks to key off of.`
@@ -35,9 +35,19 @@ func discoverCmdRun(c *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
-	tasks, err := nc.ListTasks(nomad.QueryOpts{})
+	namespaces, err := nc.ListNamespaces()
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	tasks := []nomad.Task{}
+	for _, n := range namespaces {
+		t, err := nc.ListTasks(nomad.QueryOpts{Namespace: n})
+		if err != nil {
+			log.Printf("Error querying namespace %s: %v", n, err)
+			continue
+		}
+		tasks = append(tasks, t...)
 	}
 
 	for _, task := range tasks {

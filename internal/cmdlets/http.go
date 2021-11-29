@@ -6,9 +6,9 @@ import (
 
 var (
 	httpCmd = &cobra.Command{
-		Use: "http",
+		Use:   "http",
 		Short: "http provides http servelets for various features and functions",
-		Long: httpCmdLongDocs,
+		Long:  httpCmdLongDocs,
 	}
 	httpCmdLongDocs = `http cmdlets provide various servers for different parts of the
 yurt-tools stack.`

@@ -1,8 +1,8 @@
 package cmdlets
 
 import (
-	"log"
 	"github.com/spf13/cobra"
+	"log"
 
 	"github.com/the-maldridge/yurt-tools/internal/http"
 	"github.com/the-maldridge/yurt-tools/internal/http/hello"
@@ -10,10 +10,10 @@ import (
 
 var (
 	httpHelloCmd = &cobra.Command{
-		Use: "hello",
+		Use:   "hello",
 		Short: "hello provides a static webserver that generates a hello world and 204 response",
-		Long: httpHelloCmdLongDocs,
-		Run: httpHelloCmdRun,
+		Long:  httpHelloCmdLongDocs,
+		Run:   httpHelloCmdRun,
 	}
 	httpHelloCmdLongDocs = `It is often useful to generate a static HTTP response to test load
 balancers, associated routing infrastructure, and other components of

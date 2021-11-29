@@ -6,9 +6,9 @@ import (
 
 var (
 	infoCmd = &cobra.Command{
-		Use: "info",
+		Use:   "info",
 		Short: "info cmdlets scrape information from tasks",
-		Long: infoCmdLongDocs,
+		Long:  infoCmdLongDocs,
 	}
 	infoCmdLongDocs = `info cmdlets provide various information services which
 either obtain information from tasks directly, or provide

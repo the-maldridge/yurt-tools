@@ -22,12 +22,13 @@ type QueryOpts struct {
 
 // Task represents a simplified view of a nomad task.
 type Task struct {
-	Job    string
-	Group  string
-	Name   string
-	Driver string
-	URL    string
-	Docker docker.Image
+	Namespace string
+	Job       string
+	Group     string
+	Name      string
+	Driver    string
+	URL       string
+	Docker    docker.Image
 }
 
 // New returns a new nomad client initialized with parameters from the
@@ -40,6 +41,21 @@ func New() (*Client, error) {
 	x := new(Client)
 	x.Client = c
 	return x, nil
+}
+
+// ListNamespaces returns a list of namespaces in the given cluster.
+func (c *Client) ListNamespaces() ([]string, error) {
+	list, _, err := c.Namespaces().List(&api.QueryOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]string, len(list))
+	for i := range list {
+		out[i] = list[i].Name
+	}
+
+	return out, nil
 }
 
 // ListTasks crawls nomad for running tasks.  This can include batch
@@ -63,17 +79,18 @@ func (c *Client) ListTasks(cfg QueryOpts) ([]Task, error) {
 			continue
 		}
 
-		job, _, err := c.Jobs().Info(i.ID, nil)
+		job, _, err := c.Jobs().Info(i.ID, &qopts)
 		if err != nil {
 			return nil, err
 		}
 		for _, taskGroup := range job.TaskGroups {
 			for _, task := range taskGroup.Tasks {
 				t := Task{
-					Job:    *job.Name,
-					Group:  *taskGroup.Name,
-					Name:   task.Name,
-					Driver: task.Driver,
+					Namespace: cfg.Namespace,
+					Job:       *job.Name,
+					Group:     *taskGroup.Name,
+					Name:      task.Name,
+					Driver:    task.Driver,
 				}
 
 				switch t.Driver {

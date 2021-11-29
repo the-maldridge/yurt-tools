@@ -42,7 +42,7 @@ func (c *Consul) UpdateTaskData(t nomad.Task, key string, data interface{}) erro
 	}
 
 	pair := api.KVPair{
-		Key:   path.Join(c.prefix, "taskinfo", t.Job, t.Group, t.Name, key),
+		Key:   path.Join(c.prefix, "taskinfo", t.Namespace, t.Job, t.Group, t.Name, key),
 		Value: bytes,
 	}
 
@@ -78,7 +78,7 @@ func (c *Consul) KnownTasks() ([]nomad.Task, error) {
 func (c *Consul) LoadAllForTask(t nomad.Task) (TaskData, error) {
 	m := make(TaskData)
 
-	kvps, _, err := c.KV().List(path.Join(c.prefix, "taskinfo", t.Job, t.Group, t.Name), nil)
+	kvps, _, err := c.KV().List(path.Join(c.prefix, "taskinfo", t.Namespace, t.Job, t.Group, t.Name), nil)
 	if err != nil {
 		return nil, err
 	}

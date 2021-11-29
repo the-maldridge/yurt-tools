@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type Hello struct {}
+type Hello struct{}
 
 func New() *Hello {
 	return &Hello{}

@@ -1,8 +1,8 @@
 package http
 
 import (
-	"log"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -12,9 +12,9 @@ import (
 // New initializes the server with its default routers.
 func New() (*Server, error) {
 	s := Server{
-	r: chi.NewRouter(),
-	n: &http.Server{},
-}
+		r: chi.NewRouter(),
+		n: &http.Server{},
+	}
 
 	s.r.Use(middleware.Logger)
 	s.r.Use(middleware.Heartbeat("/healthz"))
