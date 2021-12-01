@@ -1,0 +1,16 @@
+<html>
+  <head>
+    <title>{% block title %}Yurt Tools{% endblock %}</title>
+    <link href="/static/css/reset.css" rel="stylesheet">
+    <link href="/static/css/theme.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="top-bar" class="bar">
+      <div class="bar-item">Yurt Tools</div>
+    </div>
+    <div id="content">
+      {% block content %}
+      {% endblock %}
+    </div>
+  </body>
+</html>

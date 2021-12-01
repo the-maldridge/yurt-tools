@@ -1,0 +1,27 @@
+{% extends "base.p2" %}
+
+{% block content %}
+<ul>
+{% for namespace, jobs in data %}
+<li>{{namespace}}
+  <ul>
+    {% for job, groups in jobs %}
+    <li>{{job}}
+      <ul>
+        {% for group, tasks in groups %}
+        <li>{{group}}
+          <ul>
+            {% for task, info in tasks %}
+            <li>{{task}} - {% if info.versions %}Version Information Available{% else %}No Versioning{% endif %}</li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% endfor %}
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
+</li>
+{% endfor %}
+</ul>
+{% endblock %}

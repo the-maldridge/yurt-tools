@@ -11,16 +11,20 @@ import (
 var (
 	httpTaskInfoCmd = &cobra.Command{
 		Use:   "taskinfo",
-		Short: "taskinfo provides a web server that serves JSON information for each task",
+		Short: "taskinfo provides a web server with aggregated information",
 		Long:  httpTaskInfoCmdLongDocs,
 		Run:   httpTaskInfoCmdRun,
 	}
 	httpTaskInfoCmdLongDocs = `taskinfo provides 2 endpoints that may be queried:
-/all - Provides all tasks in one large array
-/detail/{namespace}/{job}/{group}/{task} - Detail for one task
 
-These two endpoints will always return JSON encoded data.
-`
+/data/all - Provides all tasks in one large array
+/data/detail/{namespace}/{job}/{group}/{task} - Detail for one task
+
+/view/ - HTML overview of status
+/view/{namespace}/ - Same as above, per namespace
+
+Endpoints under /data should be expected to return JSON.  Endpoints
+under /view will return HTML.`
 )
 
 func init() {

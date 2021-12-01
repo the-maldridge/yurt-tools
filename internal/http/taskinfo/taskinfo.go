@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/flosch/pongo2/v4"
 	"github.com/go-chi/chi/v5"
 
 	"github.com/the-maldridge/yurt-tools/internal/consul"
@@ -20,6 +21,8 @@ type TaskInfo struct {
 	data map[string]map[string]map[string]map[string]consul.TaskData
 
 	dMutex sync.RWMutex
+
+	tmpls *pongo2.TemplateSet
 }
 
 func New() (*TaskInfo, error) {
@@ -28,10 +31,17 @@ func New() (*TaskInfo, error) {
 		return nil, err
 	}
 
-	x := &TaskInfo{
-		cc:   c,
-		data: make(map[string]map[string]map[string]map[string]consul.TaskData),
+	sbl, err := pongo2.NewSandboxedFilesystemLoader("theme/p2")
+	if err != nil {
+		return nil, err
 	}
+
+	x := &TaskInfo{
+		cc:    c,
+		data:  make(map[string]map[string]map[string]map[string]consul.TaskData),
+		tmpls: pongo2.NewSet("html", sbl),
+	}
+	x.tmpls.Debug = true
 	x.update()
 
 	return x, nil
@@ -40,8 +50,10 @@ func New() (*TaskInfo, error) {
 func (ti *TaskInfo) HTTPEntry() chi.Router {
 	r := chi.NewRouter()
 
-	r.Get("/all", ti.dumpAll)
-	r.Get("/detail/{namespace}/{job}/{group}/{task}", ti.dumpTask)
+	r.Get("/data/all", ti.dumpAll)
+	r.Get("/data/detail/{namespace}/{job}/{group}/{task}", ti.dumpTask)
+
+	r.Get("/view/", ti.viewAll)
 
 	return r
 }
@@ -100,4 +112,25 @@ func (ti *TaskInfo) dumpTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	enc.Encode(d)
+}
+
+func (ti *TaskInfo) viewAll(w http.ResponseWriter, r *http.Request) {
+	t, err := ti.tmpls.FromCache("taskinfo.p2")
+	if err != nil {
+		ti.templateErrorHandler(w, err)
+		return
+	}
+	ti.dMutex.RLock()
+	defer ti.dMutex.RUnlock()
+	ctx := make(map[string]interface{})
+	ctx["data"] = ti.data
+	if err := t.ExecuteWriter(ctx, w); err != nil {
+		ti.templateErrorHandler(w, err)
+	}
+}
+
+func (ti *TaskInfo) templateErrorHandler(w http.ResponseWriter, err error) {
+	enc := json.NewEncoder(w)
+	w.WriteHeader(http.StatusInternalServerError)
+	enc.Encode(map[string]string{"error": err.Error()})
 }
