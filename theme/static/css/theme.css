@@ -1,59 +1,425 @@
+/* Dark media queries / default */
+:root {
+  --adjust-sm-color-reverse: rgba(0, 0, 0, 0.025);
+  --adjust-xs-color: rgba(255, 255, 255, 0.0125);
+  --adjust-sm-color: rgba(255, 255, 255, 0.025);
+  --adjust-color: rgba(255, 255, 255, 0.05);
+  --adjust-lg-color: rgba(255, 255, 255, 0.1);
+  --adjust-xl-color: rgba(255, 255, 255, 0.3);
+  --error-color: #e67074;
+  --info-color: #bbe;
+  --success-color: #22e6a8;
+  --bg-color: #121212;
+  --text-color-light: rgba(255, 255, 255, 0.7);
+  --text-color: rgba(255, 255, 255, 0.95);
+  --darken-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Light media queries */
+@media (prefers-color-scheme: light) {
+  :root {
+    --adjust-sm-color-reverse: rgba(255, 255, 255, 0.025);
+    --adjust-xs-color: rgba(0, 0, 0, 0.0125);
+    --adjust-sm-color: rgba(0, 0, 0, 0.025);
+    --adjust-color: rgba(0, 0, 0, 0.05);
+    --adjust-lg-color: rgba(0, 0, 0, 0.1);
+    --adjust-xl-color: rgba(0, 0, 0, 0.3);
+    --bg-color: #fff;
+    --error-color: #d41041;
+    --info-color: #5656ac;
+    --success-color: #02ab85;
+    --text-color-light: #454545;
+    --text-color: #121212;
+    --text-color-light: rgba(0, 0, 0, 0.7);
+    --text-color: rgba(0, 0, 0, 0.95);
+  }
+}
+
+/* Baseline stuff */
 body {
-    width: 100%;
-    height: 100%;
-    overflow-x: hidden;
+  overscroll-behavior: none;
+  width: 100%;
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color-light);
 }
 
-ul {
-    list-style-type: disc;
-    list-style-position: inside;
+/* Text formats as needed */
+h1 {
+  font-size: 2em;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0.125em 0.25em;
 }
-ol {
-    list-style-type: decimal;
-    list-style-position: inside;
+h2 {
+  font-size: 1.125em;
+  font-weight: 700;
+  margin: 0.25em;
+  text-transform: uppercase;
 }
-ul ul, ol ul {
-    list-style-type: circle;
-    list-style-position: inside;
-    margin-left: 15px;
+h3 {
+  font-size: 1em;
+  margin: 0.125em;
 }
-ol ol, ul ol {
-    list-style-type: lower-latin;
-    list-style-position: inside;
-    margin-left: 15px;
+h4 {
+  font-size: 1.125em;
 }
-
-#top-bar {
-    padding: 0.25em;
-    box-shadow: 0px 3px 3px grey;
-}
-
-#content {
-    width: 75%;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 1em;
-    flex: 1 0 auto;
+.text-sm {
+  font-size: 0.875em;
 }
 
-.bar {
-    width: 100%;
-    background: lightgrey;
+/* Margin classes */
+.m-1 {
+  margin: 0.125em;
+}
+.m-2 {
+  margin: 0.25em;
+}
+.m-3 {
+  margin: 0.5em;
+}
+.ml-1 {
+  margin-left: 0.125em;
+}
+.ml-2 {
+  margin-left: 0.25em;
+}
+.ml-3 {
+  margin-left: 0.5em;
+}
+.mt-1 {
+  margin-top: 0.125em;
+}
+.mt-2 {
+  margin-top: 0.25em;
+}
+.mt-3 {
+  margin-top: 0.5em;
 }
 
-.bar-item {
-    font-size: 2em;
-    display: block;
-}
-
-.card {
-    padding: 0.5em;
-    margin-bottom: 1em;
-    box-shadow: 3px 3px 3px grey;
-    border: 1px solid grey;
-    border-radius: 3px;
-}
-
+/* Text Align classes */
 .center {
-    text-align: center;
+  text-align: center;
+}
+
+/* Standard color-ish variants */
+.error {
+  color: var(--error-color);
+}
+.info {
+  color: var(--info-color);
+}
+.success {
+  color: var(--success-color);
+}
+.light {
+  color: var(--text-color-light);
+}
+.disabled {
+  opacity: 0.5;
+}
+
+/* Menubar classes */
+.card-nav,
+.nav {
+  padding: 0.25em;
+  box-shadow: 0px 3px 3px var(--darken-color);
+}
+.nav {
+  background: var(--adjust-lg-color);
+  border-bottom: 1px solid var(--adjust-xl-color);
+}
+.card-nav {
+  background: var(--adjust-color);
+  border-bottom: 1px solid var(--adjust-lg-color);
+}
+
+/* Card or panel classes */
+.card,
+.card-light {
+  align-content: baseline;
+  border-radius: 3px;
+  background: var(--adjust-color);
+  outline: 1px solid var(--adjust-lg-color);
+  max-width: 100%;
+}
+.card {
+  box-shadow: 3px var(--darken-color);
+  margin: 1em;
+}
+.card-light {
+  box-shadow: 2px var(--darken-color);
+  margin: 0.5em;
+}
+
+/* Horizontal icon tray classes */
+.icon-tray {
+  padding: 1em;
+}
+.icon-tray * {
+  padding-right: 1em;
+  height: 1em;
+}
+.icon-tray :last-child {
+  padding-right: 0.5em;
+}
+
+/* Grid utility classes */
+.grid {
+  display: grid;
+}
+.grid-responsive,
+.nested-grid-responsive {
+  display: grid;
+  grid-auto-columns: min-content;
+  grid-auto-flow: row;
+  margin: 0.5em;
+  max-width: 100%;
+}
+.grid-responsive > *,
+.nested-grid-responsive > * {
+  margin: 0 !important;
+  max-width: 100%;
+}
+.grid-responsive {
+  grid-gap: 0.5em;
+  grid-template-columns: repeat(auto-fill, 15em);
+}
+.nested-grid-responsive {
+  grid-gap: 1.5em;
+  grid-template-columns: repeat(auto-fit, 14em);
+}
+/* Minimal variant converts to single column for sidebar UX */
+.grid-responsive.minimized,
+.grid-responsive.minimized .nested-grid-responsive {
+  grid-template-columns: 1fr;
+}
+.grid-responsive.minimized .col-1,
+.grid-responsive.minimized .col-2,
+.grid-responsive.minimized .col-3,
+.grid-responsive.minimized .col-4,
+.grid-responsive.minimized .col-5,
+.grid-responsive.minimized .col-6,
+.grid-responsive.minimized .col-7,
+.grid-responsive.minimized .col-8,
+.grid-responsive.minimized .col-9,
+.grid-responsive.minimized .col-10,
+.grid-responsive.minimized .col-11,
+.grid-responsive.minimized .col-12 {
+  grid-column: span 1;
+}
+
+/* Making sure that the ux scales down well */
+.col-1 {
+  grid-column: span 1;
+}
+.col-2 {
+  grid-column: span 2;
+}
+.col-3 {
+  grid-column: span 3;
+}
+.col-4 {
+  grid-column: span 4;
+}
+.col-5 {
+  grid-column: span 5;
+}
+.col-6 {
+  grid-column: span 6;
+}
+.col-7 {
+  grid-column: span 7;
+}
+.col-8 {
+  grid-column: span 8;
+}
+.col-9 {
+  grid-column: span 9;
+}
+.col-10 {
+  grid-column: span 10;
+}
+.col-11 {
+  grid-column: span 11;
+}
+.col-12 {
+  grid-column: span 12;
+}
+@media only screen and (min-width: 500px) {
+  .col-2,
+  .col-3,
+  .col-4,
+  .col-5,
+  .col-6,
+  .col-7,
+  .col-8,
+  .col-9,
+  .col-10,
+  .col-11,
+  .col-12 {
+    grid-column: span 2;
+  }
+  .grid-responsive {
+    grid-template-columns: repeat(2, 15em);
+  }
+}
+@media only screen and (min-width: 750px) {
+  .col-3,
+  .col-4,
+  .col-5,
+  .col-6,
+  .col-7,
+  .col-8,
+  .col-9,
+  .col-10,
+  .col-11,
+  .col-12 {
+    grid-column: span 3;
+  }
+  .grid-responsive {
+    grid-template-columns: repeat(3, 15em);
+  }
+}
+@media only screen and (min-width: 1000px) {
+  .col-4,
+  .col-5,
+  .col-6,
+  .col-7,
+  .col-8,
+  .col-9,
+  .col-10,
+  .col-11,
+  .col-12 {
+    grid-column: span 4;
+  }
+  .grid-responsive {
+    grid-template-columns: repeat(4, 15em);
+  }
+}
+@media only screen and (min-width: 1250px) {
+  .col-5,
+  .col-6,
+  .col-7,
+  .col-8,
+  .col-9,
+  .col-10,
+  .col-11,
+  .col-12 {
+    grid-column: span 5;
+  }
+  .grid-responsive {
+    grid-template-columns: repeat(5, 15em);
+  }
+}
+@media only screen and (min-width: 1500px) {
+  .col-6,
+  .col-7,
+  .col-8,
+  .col-9,
+  .col-10,
+  .col-11,
+  .col-12 {
+    grid-column: span 6;
+  }
+  .grid-responsive {
+    grid-template-columns: repeat(6, 15em);
+  }
+}
+@media only screen and (min-width: 1750px) {
+  .col-7,
+  .col-8,
+  .col-9,
+  .col-10,
+  .col-11,
+  .col-12 {
+    grid-column: span 7;
+  }
+  .grid-responsive {
+    grid-template-columns: repeat(7, 15em);
+  }
+}
+@media only screen and (min-width: 2000px) {
+  .col-8,
+  .col-9,
+  .col-10,
+  .col-11,
+  .col-12 {
+    grid-column: span 8;
+  }
+  .grid-responsive {
+    grid-template-columns: repeat(8, 15em);
+  }
+}
+@media only screen and (min-width: 2250px) {
+  .col-9,
+  .col-10,
+  .col-11,
+  .col-12 {
+    grid-column: span 9;
+  }
+  .grid-responsive {
+    grid-template-columns: repeat(9, 15em);
+  }
+}
+@media only screen and (min-width: 2500px) {
+  .col-10,
+  .col-11,
+  .col-12 {
+    grid-column: span 10;
+  }
+  .grid-responsive {
+    grid-template-columns: repeat(10, 15em);
+  }
+}
+@media only screen and (min-width: 2750px) {
+  .col-11,
+  .col-12 {
+    grid-column: span 11;
+  }
+  .grid-responsive {
+    grid-template-columns: repeat(11, 15em);
+  }
+}
+@media only screen and (min-width: 3000px) {
+  .col-12 {
+    grid-column: span 12;
+  }
+  .grid-responsive {
+    grid-template-columns: repeat(12, 15em);
+  }
+}
+
+/* Flex utility classes */
+.flex {
+  display: flex;
+  align-items: center;
+}
+.flex-fixed {
+  flex: 0 0 auto;
+}
+.flex-variable {
+  flex: 1 1 auto;
+}
+
+/* List item controls */
+.list-item {
+  text-overflow: ellipsis;
+  padding: 0.25em 0;
+}
+.list-item:nth-child(odd) {
+  background: var(--adjust-sm-color-reverse);
+}
+.list-item:nth-child(even) {
+  background: var(--adjust-sm-color);
+}
+.list-item:hover {
+  background: var(--adjust-color);
+}
+.list-item.active {
+  background: var(--adjust-lg-color);
+}
+.list-item:active {
+  background: var(--adjust-xl-color);
 }

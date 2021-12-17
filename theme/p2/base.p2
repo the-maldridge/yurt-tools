@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>{% block title %}Yurt Tools{% endblock %}</title>
@@ -5,8 +6,8 @@
     <link href="/static/css/theme.css" rel="stylesheet">
   </head>
   <body>
-    <div id="top-bar" class="bar">
-      <div class="bar-item">Yurt Tools</div>
+    <div class="nav">
+      <h1>Task Info</h1>
     </div>
     <div id="content">
       {% block content %}
