@@ -1,6 +1,8 @@
 package nomad
 
 import (
+	"path"
+
 	"github.com/hashicorp/nomad/api"
 
 	"github.com/the-maldridge/yurt-tools/internal/docker"
@@ -29,6 +31,12 @@ type Task struct {
 	Driver    string
 	URL       string
 	Docker    docker.Image
+}
+
+// Path returns a path like string representation of where the task
+// lives in the hierarchy.
+func (t Task) Path() string {
+	return "/" + path.Join(t.Namespace, t.Job, t.Group, t.Name)
 }
 
 // New returns a new nomad client initialized with parameters from the

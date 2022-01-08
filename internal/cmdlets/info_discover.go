@@ -40,19 +40,39 @@ func discoverCmdRun(c *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
-	tasks := []nomad.Task{}
+	tasks := make(map[string]nomad.Task)
 	for _, n := range namespaces {
-		t, err := nc.ListTasks(nomad.QueryOpts{Namespace: n})
+		tl, err := nc.ListTasks(nomad.QueryOpts{Namespace: n})
 		if err != nil {
 			log.Printf("Error querying namespace %s: %v", n, err)
 			continue
 		}
-		tasks = append(tasks, t...)
+		for _, t := range tl {
+			tasks[t.Path()] = t
+		}
 	}
 
-	for _, task := range tasks {
+	kt, err := cs.KnownTasks()
+	if err != nil {
+		log.Printf("Error reading back task list")
+		return
+	}
+	known := make(map[string]nomad.Task, len(kt))
+	for _, k := range kt {
+		known[k.Path()] = k
+	}
+
+	for path, task := range tasks {
 		if err := cs.UpdateTaskData(task, "metadata", task); err != nil {
 			log.Printf("Could not update task metadata: %v", err)
+		}
+		delete(known, path)
+	}
+
+	for k, t := range known {
+		log.Printf("Obsolete Task: %s", k)
+		if err := cs.DeleteTask(t); err != nil {
+			log.Printf("Could not remove obsolete task: %v", err)
 		}
 	}
 }
