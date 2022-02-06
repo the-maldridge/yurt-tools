@@ -5,13 +5,13 @@
 {% endmacro %}
 
 {% macro lock_from_info(info) export %}
-  {% if info.versions && info.versions.UpToDate %}
-    {{lock_icon("success")}}
-  {% else %}
-    {% if info.versions %}
-      {{lock_icon("error")}}
+  {% if info.trivy && info.trivy.Results %}
+    {% if info.trivy.Results|countVulnerabilties == 0 %}
+      {{lock_icon("success")}}
     {% else %}  
-      {{lock_icon("disabled")}}
+      {{lock_icon("error")}}
     {% endif %}
+  {% else %}
+    {{lock_icon("disabled")}}
   {% endif %}
 {% endmacro %}

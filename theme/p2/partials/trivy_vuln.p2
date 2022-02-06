@@ -1,0 +1,7 @@
+PkgName: {{vuln.PkgName}}<br />
+Vulnerability: {{vuln.VulnerabilityID}}<br />
+Severity: {{vuln.Severity}}<br />
+Installed: {{vuln.InstalledVersion}}<br />
+Fixed: {{vuln.FixedVersion}}<br />
+Cf.: <a href="{{vuln.PrimaryURL}}">More Info</a><br />
+Description: {{vuln.Description|truncatewords:20}}<br />

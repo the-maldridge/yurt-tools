@@ -1,0 +1,9 @@
+Class: {{section.Class}}<br />
+Type: {{section.Type}}<br />
+
+{% for vuln in section.Vulnerabilities %}
+  {% with vuln=vuln %}
+    {% include "partials/trivy_vuln.p2" %}
+  {% endwith %}
+  <hr />
+{% endfor %}

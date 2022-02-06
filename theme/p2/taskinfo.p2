@@ -2,50 +2,65 @@
 
 {% block content %}
 
+{% import "./taskinfo_details.p2" taskinfo_details %}
+{% import "./icons/lock.p2" lock_icon, lock_from_info %}
 {% import "./icons/watch.p2" watch_icon, watch_from_info %}
 
-<div id="root-grid" class="grid-responsive">
-  {% for namespace, jobs in data %}
-  <div class="card col-{{ jobs|length }}">
-    <div class="card-nav">
-      <h2>{{namespace}}</h2>
-    </div>
-    <div class="nested-grid-responsive">
-      {% for job, groups in jobs %}
-      <div class="card-light grid col-1">
-        <div class="card-nav">
-          <h3>{{job}}</h3>
-        </div>
-        {% for group, tasks in groups %}
-        {% for task, info in tasks %}
-        <div
-          data-namespace="{{namespace}}"
-          data-job="{{job}}"
-          data-group="{{group}}"
-          data-task="{{task}}"
-          class="list-item flex"
-        >
-          <div class="flex flex-variable">
-            <div class="ml-3">
-              <p>
-                {{task}}
-              </p>
-              <p class="text-sm info ml-1 mt-1">
-                {{group}}
-              </p>
+<div class="scroll-region">
+  <div id="root-grid" class="h-fit-content grid-responsive{% if hasActiveTask %} minimized {% endif %}">
+    {% for namespace, jobs in data %}
+    <div class="card col-{% if jobs|length > 12 %}12{% else %}{{jobs|length}}{% endif %}">
+      <div class="card-nav">
+        <h2 class="text-light">{{namespace}}</h2>
+      </div>
+      <div class="nested-grid-responsive">
+        {% for job, groups in jobs %}
+        <div class="card-light grid col-1">
+          <div class="card-nav">
+            <h3>{{job}}</h3>
+          </div>
+          {% for group, tasks in groups %}
+          {% for task, info in tasks %}
+          <div
+            data-namespace="{{namespace}}"
+            data-job="{{job}}"
+            data-group="{{group}}"
+            data-task="{{task}}"
+            class="list-item flex {% if job == activeTask.job && namespace == activeTask.namespace && group == activeTask.group && task == activeTask.task %} active {% endif %}"
+          >
+            <div class="flex flex-variable">
+              <div class="ml-3">
+                <p>
+                  {{task}}
+                </p>
+                <p class="text-sm info ml-1 mt-1">
+                  {{group}}
+                </p>
+              </div>
+            </div>
+            <div class="icon-tray flex flex-fixed">
+              {{watch_from_info(info)}}
+              {{lock_from_info(info)}}
             </div>
           </div>
-          <div class="icon-tray flex flex-fixed">
-            {{watch_from_info(info)}}
-          </div>
+          {% endfor %}
+          {% endfor %}
         </div>
         {% endfor %}
-        {% endfor %}
       </div>
-      {% endfor %}
     </div>
+    {% endfor %}
   </div>
-  {% endfor %}
 </div>
+{% if hasActiveTask %}
+  <div id="root-detail" class="scroll-region">
+    {{taskinfo_details(activeTaskData)}}
+  </div>
+{% else %}
+  <div id="root-detail" class="scroll-region"></div>
+{% endif %}
 <script src="/static/js/taskInfo.js"></script>
+<script>
+  window.data = 
+</script>
 {% endblock %}

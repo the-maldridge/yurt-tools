@@ -8,7 +8,6 @@ import (
 
 	"github.com/flosch/pongo2/v4"
 	"github.com/go-chi/chi/v5"
-
 	"github.com/the-maldridge/yurt-tools/internal/consul"
 	"github.com/the-maldridge/yurt-tools/internal/nomad"
 )
@@ -53,7 +52,9 @@ func (ti *TaskInfo) HTTPEntry() chi.Router {
 	r.Get("/data/all", ti.dumpAll)
 	r.Get("/data/detail/{namespace}/{job}/{group}/{task}", ti.dumpTask)
 
-	r.Get("/view/", ti.viewAll)
+	r.Get("/view", ti.viewAll)
+	r.Get("/view/{namespace}/{job}/{group}/{task}", ti.viewAll)
+	r.Get("/view/{namespace}/{job}/{group}/{task}/details", ti.viewDetails)
 
 	return r
 }
@@ -114,6 +115,22 @@ func (ti *TaskInfo) dumpTask(w http.ResponseWriter, r *http.Request) {
 	enc.Encode(d)
 }
 
+func getTaskData(ti *TaskInfo, r *http.Request) (consul.TaskData, map[string]string, bool) {
+	namespace := chi.URLParam(r, "namespace")
+	job := chi.URLParam(r, "job")
+	group := chi.URLParam(r, "group")
+	task := chi.URLParam(r, "task")
+	activeTask := make(map[string]string)
+	d, ok := ti.data[namespace][job][group][task]
+	if ok {
+		activeTask["namespace"] = namespace
+		activeTask["job"] = job
+		activeTask["group"] = group
+		activeTask["task"] = task
+	}
+	return d, activeTask, ok
+}
+
 func (ti *TaskInfo) viewAll(w http.ResponseWriter, r *http.Request) {
 	t, err := ti.tmpls.FromCache("taskinfo.p2")
 	if err != nil {
@@ -124,6 +141,29 @@ func (ti *TaskInfo) viewAll(w http.ResponseWriter, r *http.Request) {
 	defer ti.dMutex.RUnlock()
 	ctx := make(map[string]interface{})
 	ctx["data"] = ti.data
+	d, activeTask, hasActiveTask := getTaskData(ti, r)
+	ctx["hasActiveTask"] = hasActiveTask
+	ctx["activeTask"] = activeTask
+	ctx["activeTaskData"] = d
+	if err := t.ExecuteWriter(ctx, w); err != nil {
+		ti.templateErrorHandler(w, err)
+	}
+}
+
+func (ti *TaskInfo) viewDetails(w http.ResponseWriter, r *http.Request) {
+	t, err := ti.tmpls.FromCache("taskinfo_details.p2")
+	if err != nil {
+		ti.templateErrorHandler(w, err)
+		return
+	}
+	ti.dMutex.RLock()
+	defer ti.dMutex.RUnlock()
+	d, activeTask, _ := getTaskData(ti, r)
+	jsonD, _ := json.MarshalIndent(d, "", "  ")
+	log.Print(string(jsonD))
+	ctx := make(map[string]interface{})
+	ctx["activeTask"] = activeTask
+	ctx["activeTaskData"] = d
 	if err := t.ExecuteWriter(ctx, w); err != nil {
 		ti.templateErrorHandler(w, err)
 	}

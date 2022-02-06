@@ -1,0 +1,205 @@
+{% import "./icons/lock.p2" lock_icon, lock_from_info %}
+{% import "./icons/watch.p2" watch_icon, watch_from_info %}
+
+{% macro taskinfo_details(task) export %}
+  <div class="h-fit-content w-100">
+    <div class="mt-4 ml-3">
+      <span class="text-lg">
+        {{activeTask.namespace}}
+      </span>
+      >>
+      <span class="text-lg">
+        {{activeTask.job}}
+      </span>
+      >>
+      <span class="text-lg">
+        {{activeTask.group}}
+      </span>
+    </div>
+    <div class="mt-4 flex flex-row align-i-stretch">
+      <div class="flex flex-grow px-3 align-i-inherit">
+        <div class="big-card card w-100 p-4">
+          <p class="text-sm">
+            docker
+          </p>
+          <p class="text-lg ml-0 mt-3">
+            {{activeTask.group}}
+          </p>
+          <p class="text-sm mt-4 info">
+            {{activeTaskData.versions.Current}}
+          </p>
+          <p class="text-sm mt-3">
+            {% if activeTaskData.metadata.Docker.Owner %}
+              {{activeTaskData.metadata.Docker.Owner}}
+            {% else %}
+              {{activeTaskData.metadata.Docker.Image}}
+            {% endif %}
+          </p>
+          <p class="text-sm text-wide mt-5">
+            <a href="{{activeTaskData.metadata.URL}}" target="_blank">
+              REGISTRY
+            </a>
+          </p>
+        </div>
+      </div>
+      <div class="flex flex-grow px-3 align-i-inherit">
+        <div class="big-card card w-100 p-4">
+          <p class="text-sm">
+            security
+          </p>
+          <div class="icon-tray mt-3 p-0 mb-4">
+          {% if activeTaskData.trivy.Results|length == 0 %}
+              <span class="text-lg ml-0">
+                No Data available
+              </span>
+          {% else %}
+            {% if activeTaskData.trivy.Results|countVulnerabilties == 0 %}
+                <span class="text-lg ml-0">
+                  No Vulnerabilities Found
+                </span>
+                {{lock_icon("success")}}
+            {% else %}
+                <span class="text-lg ml-0">
+                  Vulnerabilities Found
+                </span>
+                {{lock_icon("error")}}
+            {% endif %}
+          {% endif %}
+          </div>
+          {% for Result in activeTaskData.trivy.Results %}
+            <div class="w-100 mb-3">
+              <span class="text-sm">
+                {{Result.Class}}/{{Result.Type}}:&nbsp;
+              </span>
+              <span class="text-sm info">
+                {{Result.Vulnerabilities|length}} vulnerabilit{{Result|length|pluralize:"y,ies"}} discovered
+              </span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="flex flex-grow px-3 align-i-inherit">
+        <div class="big-card card w-100 p-4">
+          <p class="text-sm">
+            version
+          </p>
+          {% if activeTaskData.versions.UpToDate %}
+            <div class="icon-tray mt-3 p-0">
+              <span class="text-lg ml-0">
+                Up to date
+              </span>
+              {{watch_icon("success")}}
+            </div>
+          {% else %}  
+            <div class="icon-tray mt-3 p-0">
+              <span class="text-lg ml-0">
+                Not up to date
+              </span>
+              {{watch_icon("error")}}
+            </div>
+          {% endif %}
+          <p class="text-sm mt-4 info">
+            {{activeTaskData.versions.Current}}
+          </p>
+          <p class="text-sm mt-3">
+            {% if activeTaskData.versions.UpToDate %}
+              Latest version
+            {% else %}
+              Not on latest version
+            {% endif %}
+          </p>
+          <p class="text-sm text-wide mt-5">
+            <a href="{{activeTaskData.metadata.URL}}/tags" target="_blank">
+              TAGS
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+    {% if activeTaskData.trivy.Results|length != 0 %}
+      {% for Result in activeTaskData.trivy.Results %}
+        <div class="m-4 text-light">
+          {{Result.Target}}
+        </div>
+        <table class="m-4 mt-5 text-sm">
+          <tr class="mb-4 sticky-table-header">
+            <th>
+              <span class="text-light">
+                Package Name
+              </span>
+            </th>
+            <th class="cve-col">
+              <span class="text-light">
+                Vulnerability
+              </span>
+            </th>
+            <th>
+              <span class="text-light">
+                Severity
+              </span>
+            </th>
+            <th>
+              <span class="text-light">
+                Installed Version
+              </span>
+            </th>
+            <th>
+              <span class="text-light">
+                Fixed Version
+              </span>
+            </th>
+            <th>
+              <span class="text-light">
+                More Info
+              </span>
+            </th>
+            <th>
+              <span class="text-light">
+                Description
+              </span>
+            </th>
+          </tr>
+          {% for Vuln in Result.Vulnerabilities %}
+            <tr>
+              <td>
+                <span class="text-light">
+                  {{Vuln.PkgName}}
+                </span>
+              </td>
+              <td class="cve-col">
+                <span class="text-light">
+                  {{Vuln.VulnerabilityID}}
+                </span>
+              </td>
+              <td>
+                <span class="severity-{{Vuln.Severity|lower}}">
+                  {{Vuln.Severity}}
+                </span>
+              </td>
+              <td>
+                <span class="text-light">
+                  {{Vuln.InstalledVersion}}
+                </span>
+              </td>
+              <td>
+                <span class="text-light">
+                  {{Vuln.FixedVersion}}
+                </span>
+              </td>
+              <td>
+                <a href="{{Vuln.PrimaryURL}}" target="_blank">Link</a>
+              </td>
+              <td>
+                <span class="text-light">
+                  {{Vuln.Description|truncatewords:20}}
+                </span>
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% endfor %}
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{{taskinfo_details(task)}}

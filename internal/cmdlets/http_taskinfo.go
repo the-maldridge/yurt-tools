@@ -1,8 +1,9 @@
 package cmdlets
 
 import (
-	"github.com/spf13/cobra"
 	"log"
+
+	"github.com/spf13/cobra"
 
 	"github.com/the-maldridge/yurt-tools/internal/http"
 	"github.com/the-maldridge/yurt-tools/internal/http/taskinfo"

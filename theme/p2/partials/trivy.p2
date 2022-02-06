@@ -1,0 +1,9 @@
+Artifact: {{trivy.ArtifactName}}<br />
+Type: {{trivy.ArtifactType}}<br />
+
+{% for section in trivy.Results %}
+  {% with section=section %}
+    {% include "partials/trivy_results.p2" %}
+  {% endwith %}
+  <hr />
+{% endfor %}
