@@ -64,7 +64,6 @@ func trivyCmdRun(c *cobra.Command, args []string) {
 					"trivy",
 				),
 			}
-			log.Println(meta)
 			nc.Dispatch("trivy-scan", meta)
 		}
 	}
