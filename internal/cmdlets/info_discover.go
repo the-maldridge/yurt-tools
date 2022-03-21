@@ -54,7 +54,7 @@ func discoverCmdRun(c *cobra.Command, args []string) {
 
 	kt, err := cs.KnownTasks()
 	if err != nil {
-		log.Printf("Error reading back task list")
+		log.Printf("Error reading back task list: %v", err)
 		return
 	}
 	known := make(map[string]nomad.Task, len(kt))
