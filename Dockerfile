@@ -10,4 +10,5 @@ RUN apk add --no-cache ca-certificates
 FROM scratch
 COPY --from=build /yurt /yurt
 COPY --from=cacerts /etc/ssl /etc/ssl
+COPY theme /theme
 ENTRYPOINT ["/yurt"]
