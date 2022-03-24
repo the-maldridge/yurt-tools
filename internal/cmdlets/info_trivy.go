@@ -34,6 +34,11 @@ func trivyCmdRun(c *cobra.Command, args []string) {
 		prefix = "yurt-tools"
 	}
 
+	job := os.Getenv("YURT_TRIVY_DISPATCHABLE")
+	if job == "" {
+		job = "yurt-task-trivy-scan"
+	}
+
 	cs, err := consul.New()
 	if err != nil {
 		log.Fatal(err)
@@ -64,7 +69,7 @@ func trivyCmdRun(c *cobra.Command, args []string) {
 					"trivy",
 				),
 			}
-			nc.Dispatch("trivy-scan", meta)
+			nc.Dispatch(job, meta)
 		}
 	}
 }
