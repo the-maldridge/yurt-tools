@@ -2,6 +2,7 @@ package nomad
 
 import (
 	"path"
+	"strings"
 
 	"github.com/hashicorp/nomad/api"
 
@@ -30,6 +31,7 @@ type Task struct {
 	Name      string
 	Driver    string
 	URL       string
+	Meta      map[string]string
 	Docker    docker.Image
 }
 
@@ -93,12 +95,21 @@ func (c *Client) ListTasks(cfg QueryOpts) ([]Task, error) {
 		}
 		for _, taskGroup := range job.TaskGroups {
 			for _, task := range taskGroup.Tasks {
+				if strings.HasPrefix(task.Name, "connect-proxy-") {
+					// These produce meaningless
+					// results due to being
+					// parameterized versions on a
+					// per-node basis.
+					continue
+				}
+
 				t := Task{
 					Namespace: cfg.Namespace,
 					Job:       *job.Name,
 					Group:     *taskGroup.Name,
 					Name:      task.Name,
 					Driver:    task.Driver,
+					Meta:      task.Meta,
 				}
 
 				switch t.Driver {
