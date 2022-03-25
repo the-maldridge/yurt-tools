@@ -69,7 +69,9 @@ func trivyCmdRun(c *cobra.Command, args []string) {
 					"trivy",
 				),
 			}
-			nc.Dispatch(job, meta)
+			if err := nc.Dispatch(job, meta); err != nil {
+				log.Printf("Error dispatching job: %v", err)
+			}
 		}
 	}
 }
