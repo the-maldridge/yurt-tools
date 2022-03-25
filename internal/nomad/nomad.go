@@ -114,6 +114,16 @@ func (c *Client) ListTasks(cfg QueryOpts) ([]Task, error) {
 					meta[k] = v
 				}
 
+				if _, ok := meta["yurt:taskinfo:skip"]; ok {
+					// Skip if the
+					// yurt:taskinfo:skip key has
+					// been specified, which
+					// causes this task to be
+					// invisible to the taskinfo
+					// features of the yurt-tools.
+					continue
+				}
+
 				t := Task{
 					Namespace: cfg.Namespace,
 					Job:       *job.Name,
