@@ -103,7 +103,7 @@ func (c *Client) ListTasks(cfg QueryOpts) ([]Task, error) {
 					continue
 				}
 
-				meta := make(map[string]string, len(job.Meta) + len(taskGroup.Meta) + len(task.Meta))
+				meta := make(map[string]string, len(job.Meta)+len(taskGroup.Meta)+len(task.Meta))
 				for k, v := range job.Meta {
 					meta[k] = v
 				}

@@ -8,16 +8,16 @@ import (
 
 	"github.com/flosch/pongo2/v4"
 	"github.com/go-chi/chi/v5"
-	"github.com/the-maldridge/yurt-tools/internal/consul"
+	"github.com/the-maldridge/yurt-tools/internal/kv"
 	"github.com/the-maldridge/yurt-tools/internal/nomad"
 )
 
 type TaskInfo struct {
-	cc *consul.Consul
+	cc *kv.KV
 
 	// We cache the task data in memory so we don't have to hit
 	// consul every time we load up information on a given task.
-	data map[string]map[string]map[string]map[string]consul.TaskData
+	data map[string]map[string]map[string]map[string]kv.TaskData
 
 	dMutex sync.RWMutex
 
@@ -25,7 +25,7 @@ type TaskInfo struct {
 }
 
 func New() (*TaskInfo, error) {
-	c, err := consul.New()
+	c, err := kv.NewKVBackend()
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func New() (*TaskInfo, error) {
 
 	x := &TaskInfo{
 		cc:    c,
-		data:  make(map[string]map[string]map[string]map[string]consul.TaskData),
+		data:  make(map[string]map[string]map[string]map[string]kv.TaskData),
 		tmpls: pongo2.NewSet("html", sbl),
 	}
 	x.tmpls.Debug = true
@@ -76,18 +76,18 @@ func (ti *TaskInfo) update() {
 	}
 }
 
-func (ti *TaskInfo) fillPath(task nomad.Task, data consul.TaskData) {
+func (ti *TaskInfo) fillPath(task nomad.Task, data kv.TaskData) {
 	ti.dMutex.Lock()
 	defer ti.dMutex.Unlock()
 
 	if ti.data[task.Namespace] == nil {
-		ti.data[task.Namespace] = make(map[string]map[string]map[string]consul.TaskData)
+		ti.data[task.Namespace] = make(map[string]map[string]map[string]kv.TaskData)
 	}
 	if ti.data[task.Namespace][task.Job] == nil {
-		ti.data[task.Namespace][task.Job] = make(map[string]map[string]consul.TaskData)
+		ti.data[task.Namespace][task.Job] = make(map[string]map[string]kv.TaskData)
 	}
 	if ti.data[task.Namespace][task.Job][task.Group] == nil {
-		ti.data[task.Namespace][task.Job][task.Group] = make(map[string]consul.TaskData)
+		ti.data[task.Namespace][task.Job][task.Group] = make(map[string]kv.TaskData)
 	}
 
 	ti.data[task.Namespace][task.Job][task.Group][task.Name] = data
@@ -115,7 +115,7 @@ func (ti *TaskInfo) dumpTask(w http.ResponseWriter, r *http.Request) {
 	enc.Encode(d)
 }
 
-func getTaskData(ti *TaskInfo, r *http.Request) (consul.TaskData, map[string]string, bool) {
+func getTaskData(ti *TaskInfo, r *http.Request) (kv.TaskData, map[string]string, bool) {
 	namespace := chi.URLParam(r, "namespace")
 	job := chi.URLParam(r, "job")
 	group := chi.URLParam(r, "group")

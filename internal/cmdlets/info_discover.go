@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/the-maldridge/yurt-tools/internal/consul"
+	"github.com/the-maldridge/yurt-tools/internal/kv"
 	"github.com/the-maldridge/yurt-tools/internal/nomad"
 )
 
@@ -30,7 +30,7 @@ func discoverCmdRun(c *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
-	cs, err := consul.New()
+	cs, err := kv.NewKVBackend()
 	if err != nil {
 		log.Fatal(err)
 	}

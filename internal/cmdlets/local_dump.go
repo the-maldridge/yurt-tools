@@ -7,13 +7,13 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/the-maldridge/yurt-tools/internal/consul"
+	"github.com/the-maldridge/yurt-tools/internal/kv"
 )
 
 var (
 	localDumpCmd = &cobra.Command{
 		Use:   "dump",
-		Short: "dump resources available in consul taskinfo heirarchy",
+		Short: "dump resources available in kv taskinfo heirarchy",
 		Long:  localDumpCmdLongDocs,
 		Run:   localDumpCmdRun,
 	}
@@ -25,7 +25,7 @@ func init() {
 }
 
 func localDumpCmdRun(c *cobra.Command, args []string) {
-	cc, err := consul.New()
+	cc, err := kv.NewKVBackend()
 	if err != nil {
 		log.Fatal(err)
 	}

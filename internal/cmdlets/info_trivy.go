@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/the-maldridge/yurt-tools/internal/consul"
+	"github.com/the-maldridge/yurt-tools/internal/kv"
 	"github.com/the-maldridge/yurt-tools/internal/nomad"
 )
 
@@ -39,7 +39,7 @@ func trivyCmdRun(c *cobra.Command, args []string) {
 		job = "yurt-task-trivy-scan"
 	}
 
-	cs, err := consul.New()
+	cs, err := kv.NewKVBackend()
 	if err != nil {
 		log.Fatal(err)
 	}

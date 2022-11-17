@@ -7,6 +7,7 @@ require (
 	github.com/docker/libtrust v0.0.0-20160708172513-aabc10ec26b7 // indirect
 	github.com/flosch/pongo2/v4 v4.0.2
 	github.com/go-chi/chi/v5 v5.0.7
+	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/gorilla/mux v1.7.3 // indirect
 	github.com/hashicorp/consul/api v1.4.0
 	github.com/hashicorp/go-version v1.2.0

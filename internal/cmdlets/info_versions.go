@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/the-maldridge/yurt-tools/internal/consul"
 	"github.com/the-maldridge/yurt-tools/internal/docker"
+	"github.com/the-maldridge/yurt-tools/internal/kv"
 	"github.com/the-maldridge/yurt-tools/internal/versions"
 )
 
@@ -28,7 +28,7 @@ func init() {
 }
 
 func versionsCmdRun(c *cobra.Command, args []string) {
-	cs, err := consul.New()
+	cs, err := kv.NewKVBackend()
 	if err != nil {
 		log.Fatal(err)
 	}
