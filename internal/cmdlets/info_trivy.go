@@ -29,10 +29,7 @@ func init() {
 }
 
 func trivyCmdRun(c *cobra.Command, args []string) {
-	prefix := os.Getenv("CONSUL_PREFIX")
-	if prefix == "" {
-		prefix = "yurt-tools"
-	}
+	prefix := os.Getenv("STORE_PREFIX")
 
 	job := os.Getenv("YURT_TRIVY_DISPATCHABLE")
 	if job == "" {
@@ -60,14 +57,14 @@ func trivyCmdRun(c *cobra.Command, args []string) {
 			meta := map[string]string{
 				"TRIVY_CONTAINER": task.Docker.RepoStr(),
 				"TRIVY_REGISTRY":  task.Docker.Registry().Name,
-				"TRIVY_OUTPUT": path.Join(
+				"TRIVY_OUTPUT": path.Clean(path.Join(
 					prefix,
 					"taskinfo",
 					task.Job,
 					task.Group,
 					task.Name,
 					"trivy",
-				),
+				)),
 			}
 			if err := nc.Dispatch(job, meta); err != nil {
 				log.Printf("Error dispatching job: %v", err)
