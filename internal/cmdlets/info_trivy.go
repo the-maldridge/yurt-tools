@@ -60,6 +60,7 @@ func trivyCmdRun(c *cobra.Command, args []string) {
 				"TRIVY_OUTPUT": path.Clean(path.Join(
 					prefix,
 					"taskinfo",
+					task.Namespace,
 					task.Job,
 					task.Group,
 					task.Name,
